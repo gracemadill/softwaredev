@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "shilpi",
-    "slug": "shilpi",
+    "name": "sample-easy-read",
+    "slug": "sample-easy-read",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
