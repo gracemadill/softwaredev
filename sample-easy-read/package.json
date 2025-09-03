@@ -1,5 +1,5 @@
 {
-  "name": "sample-easy-read",
+  "name": "sampleeasyread",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -17,7 +17,6 @@
     "@react-navigation/native": "^7.1.6",
     "expo": "~53.0.22",
     "expo-blur": "~14.1.5",
-    "expo-camera": "~16.1.11",
     "expo-constants": "~17.1.7",
     "expo-font": "~13.3.2",
     "expo-haptics": "~14.1.4",
@@ -29,7 +28,6 @@
     "expo-symbols": "~0.4.5",
     "expo-system-ui": "~5.0.11",
     "expo-web-browser": "~14.2.0",
-    "@react-native-async-storage/async-storage": "2.1.2",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.6",
