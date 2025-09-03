@@ -1,75 +1,177 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React from 'react';
+import { Alert, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { ActionButton } from '@/components/ActionButton';
+import { FeatureCard } from '@/components/FeatureCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function HomeScreen() {
+  const { theme } = useTheme();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
+  const handleScanDocument = () => {
+    router.push('/camera');
+  };
+
+  const handleUploadURL = () => {
+    router.push('/url-import');
+  };
+
+  const handleFeaturePress = (feature: string) => {
+    Alert.alert(feature, 'This feature is coming soon.');
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
+    <ThemedView style={styles.container}>
+      {/* Header */}
+      <ThemedView
+        style={[
+          styles.header,
+          {
+            backgroundColor: Colors[theme].headerBackground,
+            paddingTop: insets.top + 16,
+            borderTopLeftRadius: 24,
+            borderTopRightRadius: 24,
+            overflow: 'hidden',
+          },
+        ]}
+      >
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+          source={require('@/assets/images/icon.png')}
+          style={styles.logo}
+          contentFit="contain"
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
+        <ThemedText style={styles.headerTitleOnly}>Easy Read ToolKit</ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Greeting Section */}
+        <ThemedView style={styles.greetingSection}>
+          <ThemedText style={styles.greeting}>{getGreeting()}!</ThemedText>
+          <ThemedText style={styles.supportiveText}>
+            Ready to make reading easier? Let's get started!
+          </ThemedText>
+          
+
+        </ThemedView>
+
+        {/* Primary Actions */}
+        <ThemedView style={styles.actionsSection}>
+          <ThemedText style={styles.sectionTitle}>Quick Actions</ThemedText>
+          <ThemedView style={styles.actionButtons}>
+            <ActionButton
+              title="Scan Document"
+              iconName="camera.fill"
+              onPress={handleScanDocument}
+            />
+            <ActionButton
+              title="Upload URL"
+              iconName="link"
+              onPress={handleUploadURL}
+            />
+          </ThemedView>
+        </ThemedView>
+
+        {/* Feature Section */}
+        <ThemedView style={styles.featuresSection}>
+          <ThemedText style={styles.sectionTitle}>Features</ThemedText>
+          
+          <FeatureCard
+            title="Document Scanning"
+            description="Scan physical documents and convert them to readable text with advanced OCR technology."
+            iconName="doc.text.viewfinder"
+            onPress={() => handleFeaturePress('Document Scanning')}
+          />
+          
+          <FeatureCard
+            title="URL Import"
+            description="Import articles and web content directly from URLs for easy reading."
+            iconName="globe"
+            onPress={() => handleFeaturePress('URL Import')}
+          />
+          
+          <FeatureCard
+            title="Smart Library"
+            description="Organize and manage your reading materials with intelligent categorization."
+            iconName="books.vertical.fill"
+            onPress={() => handleFeaturePress('Smart Library')}
+          />
+        </ThemedView>
+      </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+  },
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    minHeight: 60,
   },
-  stepContainer: {
-    gap: 8,
+  logo: {
+    width: 32,
+    height: 32,
+    marginRight: 12,
+  },
+  headerTitleOnly: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+    textTransform: 'lowercase',
+    flex: 1,
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  scrollView: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  greetingSection: {
+    marginTop: 24,
+    marginBottom: 32,
+  },
+  greeting: {
+    fontSize: 32,
+    fontWeight: 'bold',
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  supportiveText: {
+    fontSize: 16,
+    lineHeight: 24,
+    opacity: 0.7,
+    marginBottom: 24,
+  },
+  actionsSection: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  actionButtons: {
+    gap: 12,
+  },
+  featuresSection: {
+    marginBottom: 32,
   },
 });
