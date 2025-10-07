@@ -15,73 +15,80 @@ app.use(express.json({ limit: "2mb" }));
 app.use(cors({ origin: (process.env.ALLOWED_ORIGIN || "*").split(",") }));
 app.use(rateLimit({ windowMs: 60_000, max: 60 }));
 
-// Uploads kept in memory (no temp files)
+// Uploads kept in memory
 const upload = multer({ storage: multer.memoryStorage() });
 const clamp = (s, max = 20000) => (s && s.length > max ? s.slice(0, max) : s);
 
 // Health check
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
-// (i) HOME PAGE BACKEND — AI rewrite (stub)
+// 🧠 AI Rewrite Endpoint
 const rewriteSchema = z.object({
   sentence: z.string().min(1).max(1500),
   keepTerms: z.array(z.string()).optional().default([]),
 });
 
-app.post("/ai/rewrite", (req, res) => {
+app.post("/ai/rewrite", async (req, res) => {
   try {
-    const { sentence } = rewriteSchema.parse(req.body);
-    res.json({
-      candidates: [
-        "They did not follow the policy.",
-        "They failed to follow the policy.",
-        "They did not comply with the policy.",
-      ],
+    const { sentence, keepTerms } = rewriteSchema.parse(req.body);
+
+    const systemPrompt = `You are an Easy Read editor. Rewrite the user's text in Easy Read style:
+- Short sentences (<= 15 words)
+- Simple, common words
+- Keep these terms exactly: ${keepTerms.join(", ")}
+- If a hard word remains, define it once in brackets.
+Return only the rewritten text.`;
+
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: sentence },
+        ],
+        temperature: 0.3,
+      }),
     });
+
+    if (!r.ok) {
+      const detail = await r.text();
+      return res.status(502).json({ error: `AI service failed (${r.status})`, detail });
+    }
+
+    const data = await r.json();
+    const easy = data?.choices?.[0]?.message?.content?.trim() || "";
+    res.json({ easyRead: easy });
   } catch (e) {
+    console.error("AI rewrite error:", e);
     res.status(400).json({ error: e.message || "Bad request" });
   }
 });
 
-// (ii) DOCUMENT PAGE BACKEND — PDF → text
+// 📄 PDF → Text
 app.post("/upload/pdf", upload.single("file"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-    if (req.file.mimetype !== "application/pdf") {
-      return res.status(400).json({ error: "Please upload a PDF (application/pdf)" });
-    }
-
     const data = await pdfParse(req.file.buffer);
     const text = (data.text || "").trim();
-
-    if (!text) {
-      return res.json({
-        text: "",
-        note: "No embedded text found (likely a scanned PDF). Use Image OCR instead.",
-      });
-    }
     res.json({ text: clamp(text) });
-  } catch (err) {
-    console.error("PDF parse error:", err);
+  } catch {
     res.status(500).json({ error: "Failed to parse PDF" });
   }
 });
 
-// (ii) DOCUMENT PAGE BACKEND — Image OCR
+// 🖼️ Image OCR → Text
 app.post("/upload/image", upload.single("file"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-
-    const okTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
-    if (!okTypes.includes(req.file.mimetype)) {
-      return res.status(400).json({ error: "Please upload an image (jpeg/png/webp)" });
-    }
-
     const result = await Tesseract.recognize(req.file.buffer, "eng");
     const text = (result?.data?.text || "").trim();
     res.json({ text: clamp(text) });
-  } catch (err) {
-    console.error("Image OCR error:", err);
+  } catch {
     res.status(500).json({ error: "Failed to OCR image" });
   }
 });
