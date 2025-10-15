@@ -1,24 +1,24 @@
 {
-  "name": "easy-read-backend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "easy-read-toolbox",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "run-p dev:*",
+    "dev:mobile": "pnpm --filter mobile dev",
+    "dev:api": "pnpm --filter api dev",
+    "build": "run-p build:*",
+    "build:mobile": "pnpm --filter mobile build",
+    "build:api": "pnpm --filter api build",
+    "lint": "run-p lint:*",
+    "lint:mobile": "pnpm --filter mobile lint",
+    "lint:api": "pnpm --filter api lint"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.1",
-    "express": "^5.1.0",
-    "express-rate-limit": "^8.0.1",
-    "helmet": "^8.1.0",
-    "multer": "^2.0.2",
-    "openai": "^5.23.2",
-    "pdf-parse": "^1.1.1",
-    "tesseract.js": "^6.0.1",
-    "zod": "^4.1.5"
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.6.0"
   }
 }
