@@ -1,0 +1,29 @@
+{
+  "name": "mobile",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@easy-read/shared": "workspace:*",
+    "@expo/vector-icons": "^14",
+    "@react-navigation/bottom-tabs": "^6",
+    "@react-navigation/native": "^6",
+    "@react-navigation/native-stack": "^6",
+    "axios": "^1.6",
+    "expo": "^51",
+    "expo-camera": "^15",
+    "expo-constants": "^16",
+    "expo-document-picker": "^12",
+    "expo-web-browser": "^13",
+    "react": "^18",
+    "react-native": "0.74",
+    "react-native-gesture-handler": "^2",
+    "react-native-safe-area-context": "^4",
+    "react-native-screens": "^3"
+  }
+}

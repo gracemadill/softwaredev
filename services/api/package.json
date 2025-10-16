@@ -1,0 +1,37 @@
+{
+  "name": "api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsc -p .",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@easy-read/shared": "workspace:*",
+    "cors": "^2",
+    "dotenv": "^16",
+    "express": "^4",
+    "express-rate-limit": "^7",
+    "helmet": "^7",
+    "multer": "^1.4.5-lts.1",
+    "openai": "^4",
+    "pdf-parse": "^1.1.1",
+    "stripe": "^14",
+    "tesseract.js": "^5",
+    "zod": "^3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2",
+    "@types/express": "^4",
+    "@types/multer": "^1.4.7",
+    "@types/node": "^20",
+    "eslint": "^8",
+    "tsx": "^4",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}
